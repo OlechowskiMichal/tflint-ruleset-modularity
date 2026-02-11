@@ -1,0 +1,107 @@
+version: "3"
+
+vars:
+  BINARY_NAME: myapp
+  MAIN_PACKAGE: .
+  VERSION:
+    sh: git describe --tags --always --dirty 2>/dev/null || echo "dev"
+  COMMIT:
+    sh: git rev-parse --short HEAD 2>/dev/null || echo "none"
+  DATE:
+    sh: date -u +"%Y-%m-%dT%H:%M:%SZ"
+  LDFLAGS: -s -w -X main.version={{.VERSION}} -X main.commit={{.COMMIT}} -X main.date={{.DATE}}
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  build:
+    desc: Build the binary
+    cmds:
+      - go build -trimpath -ldflags="{{.LDFLAGS}}" -o bin/{{.BINARY_NAME}} {{.MAIN_PACKAGE}}
+    sources:
+      - "**/*.go"
+    generates:
+      - bin/{{.BINARY_NAME}}
+
+  test:
+    desc: Run all tests
+    cmds:
+      - go test -v -race -coverprofile=coverage.out ./...
+
+  test:unit:
+    desc: Run unit tests only
+    cmds:
+      - go test -v -short ./...
+
+  test:coverage:
+    desc: Generate test coverage report
+    cmds:
+      - go test -coverprofile=coverage.out ./...
+      - go tool cover -html=coverage.out -o coverage.html
+      - go tool cover -func=coverage.out | grep '^total:'
+
+  lint:
+    desc: Run linters
+    cmds:
+      - golangci-lint run ./...
+
+  lint:fix:
+    desc: Run linters and fix issues
+    cmds:
+      - golangci-lint run --fix ./...
+
+  fmt:
+    desc: Format code
+    cmds:
+      - gofumpt -w .
+      - goimports -w .
+
+  vet:
+    desc: Run go vet
+    cmds:
+      - go vet ./...
+
+  tidy:
+    desc: Tidy go modules
+    cmds:
+      - go mod tidy
+
+  vulncheck:
+    desc: Check for security vulnerabilities
+    cmds:
+      - govulncheck ./...
+
+  complexity:
+    desc: Show complexity report
+    cmds:
+      - |
+        echo "=== Cyclomatic Complexity (>10) ==="
+        gocyclo -over 10 . || true
+        echo ""
+        echo "=== Cognitive Complexity (>15) ==="
+        gocognit -over 15 . || true
+
+  verify:
+    desc: Run all checks before commit
+    cmds:
+      - task: fmt
+      - task: lint
+      - task: test:unit
+
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - rm -rf bin/ dist/ coverage.out coverage.html
+
+  release:snapshot:
+    desc: Create a snapshot release
+    cmds:
+      - goreleaser release --snapshot --clean
+
+  release:
+    desc: Create a release
+    cmds:
+      - goreleaser release --clean

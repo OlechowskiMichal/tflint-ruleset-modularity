@@ -1,0 +1,94 @@
+version: "2"
+
+run:
+  timeout: 5m
+  go: "1.25"
+
+linters:
+  enable:
+    - bodyclose
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - cyclop
+    - decorder
+    - dogsled
+    - durationcheck
+    - exhaustive
+    - gochecknoglobals
+    - gochecknoinits
+    - godox
+    - gocritic
+    - gosec
+    - govet
+    - ireturn
+    - lll
+    - makezero
+    - misspell
+    - nakedret
+    - nilerr
+    - nilnil
+    - nonamedreturns
+    - noctx
+    - nosprintfhostport
+    - prealloc
+    - predeclared
+    - revive
+    - staticcheck
+    - thelper
+    - testifylint
+    - tparallel
+    - unconvert
+    - unparam
+    - wastedassign
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - gochecknoglobals
+  settings:
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - performance
+      disabled-checks: []
+    gosec: {}
+    govet:
+      enable:
+        - shadow
+    lll:
+      line-length: 120
+    nakedret:
+      max-func-lines: 30
+    revive:
+      rules:
+        - name: deep-exit
+        - name: early-return
+        - name: blank-imports
+        - name: confusing-naming
+        - name: identical-branches
+        - name: unreachable-code
+        - name: modifies-value-receiver
+        - name: waitgroup-by-value
+        - name: time-equal
+        - name: range-val-address
+        - name: datarace
+        - name: exported
+          arguments:
+            - "checkPrivateReceivers"
+            - "sayRepetitiveInsteadOfStutters"
+        - name: package-comments
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      # Update this after scaffolding
+      local-prefixes:
+        - github.com/OlechowskiMichal/go-template
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
