@@ -1,7 +1,7 @@
 version: "3"
 
 vars:
-  BINARY_NAME: myapp
+  BINARY_NAME: tflint-ruleset-modularity
   MAIN_PACKAGE: .
   VERSION:
     sh: git describe --tags --always --dirty 2>/dev/null || echo "dev"
@@ -90,6 +90,13 @@ tasks:
       - task: fmt
       - task: lint
       - task: test:unit
+
+  install:
+    desc: Build and install to ~/.tflint.d/plugins/
+    deps: [build]
+    cmds:
+      - mkdir -p ~/.tflint.d/plugins
+      - cp bin/{{.BINARY_NAME}} ~/.tflint.d/plugins/
 
   clean:
     desc: Clean build artifacts

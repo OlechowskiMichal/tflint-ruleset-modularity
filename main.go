@@ -1,10 +1,24 @@
-// Package main provides the application entry point.
+// Package main provides the TFLint plugin entry point for the modularity ruleset.
 package main
 
-import "fmt"
+import (
+	"github.com/terraform-linters/tflint-plugin-sdk/plugin"
+	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 
-var version = "dev"
+	"github.com/OlechowskiMichal/tflint-ruleset-modularity/rules"
+)
 
 func main() {
-	fmt.Printf("myapp %s\n", version)
+	plugin.Serve(&plugin.ServeOpts{
+		RuleSet: &tflint.BuiltinRuleSet{
+			Name:    "modularity",
+			Version: "0.1.0",
+			Rules: []tflint.Rule{
+				rules.NewTerraformFileLineLimitRule(),
+				rules.NewTerraformResourceFileLimitRule(),
+				rules.NewTerraformRequiredFilesRule(),
+				rules.NewTerraformPolicyDocLocationRule(),
+			},
+		},
+	})
 }

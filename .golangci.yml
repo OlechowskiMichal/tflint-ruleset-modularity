@@ -85,9 +85,8 @@ formatters:
     - goimports
   settings:
     goimports:
-      # Update this after scaffolding
       local-prefixes:
-        - github.com/OlechowskiMichal/go-template
+        - github.com/OlechowskiMichal/tflint-ruleset-modularity
 
 issues:
   max-issues-per-linter: 0
