@@ -1,0 +1,10 @@
+# Mockery Configuration
+# See: https://vektra.github.io/mockery/latest/configuration/
+
+with-expecter: true
+all: true
+filename: "mock_{{.InterfaceName}}.go"
+mockname: "Mock{{.InterfaceName}}"
+
+# Add package-specific configurations as the project grows
+packages: {}

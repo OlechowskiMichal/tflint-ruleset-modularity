@@ -1,0 +1,12 @@
+version: "3"
+
+tasks:
+  default:
+    desc: Create a release
+    cmds:
+      - goreleaser release --clean
+
+  snapshot:
+    desc: Create a snapshot release
+    cmds:
+      - goreleaser release --snapshot --clean

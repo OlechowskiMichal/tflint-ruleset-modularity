@@ -1,0 +1,8 @@
+# Errcheck exclusions for intentionally ignored errors
+# Format: (package.Type).Method or package.Function
+# Only add functions where ignoring the error is truly acceptable.
+
+# Common stdlib - file cleanup where errors are non-critical
+(*os.File).Close
+os.Remove
+os.RemoveAll
