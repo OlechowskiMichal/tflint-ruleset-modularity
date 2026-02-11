@@ -42,8 +42,19 @@ func (r *TerraformRequiredFilesRule) Link() string {
 	return ""
 }
 
+type requiredFilesConfig struct {
+	RequiredFiles []string `hclext:"required_files,optional"`
+}
+
 // Check runs the rule against the given runner.
 func (r *TerraformRequiredFilesRule) Check(runner tflint.Runner) error {
+	config := &requiredFilesConfig{RequiredFiles: r.RequiredFiles}
+	if err := runner.DecodeRuleConfig(r.Name(), config); err != nil {
+		return fmt.Errorf("decoding rule config: %w", err)
+	}
+
+	r.RequiredFiles = config.RequiredFiles
+
 	files, err := runner.GetFiles()
 	if err != nil {
 		return fmt.Errorf("getting files: %w", err)

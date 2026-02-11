@@ -10,7 +10,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-const defaultMaxLines = 500
+const defaultMaxLines = 250
 
 // TerraformFileLineLimitRule checks that .tf files do not exceed a maximum line count.
 type TerraformFileLineLimitRule struct {
@@ -44,8 +44,19 @@ func (r *TerraformFileLineLimitRule) Link() string {
 	return ""
 }
 
+type fileLineLimitConfig struct {
+	MaxLines int `hclext:"max_lines,optional"`
+}
+
 // Check runs the rule against the given runner.
 func (r *TerraformFileLineLimitRule) Check(runner tflint.Runner) error {
+	config := &fileLineLimitConfig{MaxLines: r.MaxLines}
+	if err := runner.DecodeRuleConfig(r.Name(), config); err != nil {
+		return fmt.Errorf("decoding rule config: %w", err)
+	}
+
+	r.MaxLines = config.MaxLines
+
 	files, err := runner.GetFiles()
 	if err != nil {
 		return fmt.Errorf("getting files: %w", err)

@@ -44,8 +44,19 @@ func (r *TerraformResourceFileLimitRule) Link() string {
 	return ""
 }
 
+type resourceFileLimitConfig struct {
+	MaxResources int `hclext:"max_resources,optional"`
+}
+
 // Check runs the rule against the given runner.
 func (r *TerraformResourceFileLimitRule) Check(runner tflint.Runner) error {
+	config := &resourceFileLimitConfig{MaxResources: r.MaxResources}
+	if err := runner.DecodeRuleConfig(r.Name(), config); err != nil {
+		return fmt.Errorf("decoding rule config: %w", err)
+	}
+
+	r.MaxResources = config.MaxResources
+
 	schema := &hclext.BodySchema{
 		Blocks: []hclext.BlockSchema{
 			{Type: "resource", LabelNames: []string{"type", "name"}, Body: &hclext.BodySchema{}},
