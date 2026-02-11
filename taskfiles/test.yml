@@ -1,0 +1,29 @@
+version: "3"
+
+tasks:
+  default:
+    desc: Run all tests
+    cmds:
+      - go test -v -race -coverprofile=coverage.out ./...
+
+  unit:
+    desc: Run unit tests only
+    cmds:
+      - go test -v -short ./...
+
+  race:
+    desc: Run tests with race detector
+    cmds:
+      - go test -race -short ./...
+
+  benchmark:
+    desc: Run benchmarks
+    cmds:
+      - go test -bench=. -benchmem ./...
+
+  coverage:
+    desc: Generate test coverage report
+    cmds:
+      - go test -coverprofile=coverage.out ./...
+      - go tool cover -html=coverage.out -o coverage.html
+      - go tool cover -func=coverage.out | grep '^total:'

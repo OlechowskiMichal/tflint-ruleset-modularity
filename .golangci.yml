@@ -14,6 +14,7 @@ linters:
     - decorder
     - dogsled
     - durationcheck
+    - errcheck
     - exhaustive
     - gochecknoglobals
     - gochecknoinits
@@ -41,6 +42,7 @@ linters:
     - unconvert
     - unparam
     - wastedassign
+    - filelength
   exclusions:
     rules:
       - path: _test\.go
@@ -52,6 +54,11 @@ linters:
         - diagnostic
         - performance
       disabled-checks: []
+    errcheck:
+      exclude-functions:
+        - (*os.File).Close
+        - os.Remove
+        - os.RemoveAll
     gosec: {}
     govet:
       enable:
@@ -78,6 +85,14 @@ linters:
             - "checkPrivateReceivers"
             - "sayRepetitiveInsteadOfStutters"
         - name: package-comments
+    custom:
+      filelength:
+        type: module
+        description: Enforces maximum file line counts.
+        original-url: github.com/OlechowskiMichal/golangci-lint-filelength
+        settings:
+          maxLines: 300
+          excludeTests: true
 
 formatters:
   enable:

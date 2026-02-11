@@ -33,6 +33,7 @@ Thumbs.db
 # Build
 dist/
 bin/
+custom-gcl
 
 # Environment
 .env

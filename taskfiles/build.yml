@@ -1,0 +1,23 @@
+version: "3"
+
+tasks:
+  default:
+    desc: Build the binary
+    cmds:
+      - go build -trimpath -ldflags="{{.LDFLAGS}}" -o bin/{{.BINARY_NAME}} {{.MAIN_PACKAGE}}
+    sources:
+      - "**/*.go"
+    generates:
+      - bin/{{.BINARY_NAME}}
+
+  install:
+    desc: Build and install to ~/.tflint.d/plugins/
+    deps: [default]
+    cmds:
+      - mkdir -p ~/.tflint.d/plugins
+      - cp bin/{{.BINARY_NAME}} ~/.tflint.d/plugins/
+
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - rm -rf bin/ dist/ coverage.out coverage.html

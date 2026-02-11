@@ -1,0 +1,16 @@
+version: "3"
+
+tasks:
+  verify:
+    desc: Run all checks before commit
+    cmds:
+      - task: :lint:fmt
+      - task: :lint:default
+      - task: :test:unit
+
+  all:
+    desc: Run all checks (fmt, lint, test)
+    cmds:
+      - task: :lint:fmt
+      - task: :lint:default
+      - task: :test:default

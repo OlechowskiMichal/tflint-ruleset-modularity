@@ -1,0 +1,48 @@
+version: "3"
+
+tasks:
+  default:
+    desc: Complete first-time development setup
+    cmds:
+      - task: deps
+      - task: hooks
+      - echo "Setup complete! Run 'task build:run' to start developing."
+
+  deps:
+    desc: Install Go development tools
+    cmds:
+      - |
+        if ! command -v mise &> /dev/null; then
+          echo "Installing mise..."
+          curl https://mise.run | sh
+        fi
+      - mise install || true
+      - echo "Installing Go development tools..."
+      - go install github.com/kisielk/errcheck@latest
+      - go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
+      - go install github.com/uudashr/gocognit/cmd/gocognit@latest
+      - go install golang.org/x/vuln/cmd/govulncheck@latest
+      - go install mvdan.cc/gofumpt@latest
+      - go install golang.org/x/tools/cmd/goimports@latest
+      - go install github.com/securego/gosec/v2/cmd/gosec@latest
+
+  deps-check:
+    desc: Verify all required tools are installed
+    cmds:
+      - |
+        STATUS=0
+        for tool in go task golangci-lint goreleaser lefthook mockery \
+                    errcheck gocyclo gocognit govulncheck gofumpt goimports gosec; do
+          if command -v "$tool" &> /dev/null; then
+            printf "%-20s %s\n" "$tool" "$(command -v "$tool")"
+          else
+            printf "%-20s %s\n" "$tool" "NOT FOUND"
+            STATUS=1
+          fi
+        done
+        exit $STATUS
+
+  hooks:
+    desc: Install git hooks via lefthook
+    cmds:
+      - lefthook install
