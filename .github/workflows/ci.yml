@@ -71,7 +71,7 @@ jobs:
       - name: Build
         env:
           CGO_ENABLED: "0"
-        run: go build -o myapp .
+        run: go build -o tflint-ruleset-modularity .
 
   commit-lint:
     name: Conventional Commits
