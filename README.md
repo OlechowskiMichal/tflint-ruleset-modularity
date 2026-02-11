@@ -6,10 +6,10 @@ A [TFLint](https://github.com/terraform-linters/tflint) ruleset that enforces Te
 
 | Rule | Description | Default | Severity |
 |------|-------------|---------|----------|
-| `terraform_file_line_limit` | Limits `.tf` files to a maximum line count | Enabled (500 lines) | WARNING |
-| `terraform_resource_file_limit` | Limits `resource`/`data` blocks per file | Enabled (5 blocks) | WARNING |
-| `terraform_required_files` | Enforces required files exist in the module | Enabled (`variables.tf`, `outputs.tf`) | WARNING |
-| `terraform_policy_doc_location` | Requires `aws_iam_policy_document` data sources in `policies.tf` | Disabled | WARNING |
+| `terraform_file_line_limit` | Limits `.tf` files to a maximum line count | Enabled (500 lines) | ERROR |
+| `terraform_resource_file_limit` | Limits `resource`/`data` blocks per file | Enabled (5 blocks) | ERROR |
+| `terraform_required_files` | Enforces required files exist in the module | Enabled (`variables.tf`, `outputs.tf`) | ERROR |
+| `terraform_policy_doc_location` | Requires `aws_iam_policy_document` data sources in `policies.tf` | Disabled | ERROR |
 
 ### terraform_file_line_limit
 

@@ -34,7 +34,7 @@ func (r *TerraformRequiredFilesRule) Enabled() bool {
 
 // Severity returns the rule severity.
 func (r *TerraformRequiredFilesRule) Severity() tflint.Severity {
-	return tflint.WARNING
+	return tflint.ERROR
 }
 
 // Link returns a reference URL for the rule.
