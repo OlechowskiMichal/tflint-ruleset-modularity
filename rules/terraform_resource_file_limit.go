@@ -69,10 +69,31 @@ func (r *TerraformResourceFileLimitRule) Check(runner tflint.Runner) error {
 		return fmt.Errorf("getting module content: %w", err)
 	}
 
+	// Deduplicate blocks by DefRange position. GetModuleContent expands
+	// for_each/count at runtime, returning one block per instance — all
+	// sharing the same DefRange from the original HCL definition. We
+	// count unique definitions, not expanded instances.
+	type defPos struct {
+		file   string
+		line   int
+		column int
+	}
+
+	seen := make(map[defPos]struct{})
 	fileCounts := make(map[string]int)
 	fileFirstRange := make(map[string]hcl.Range)
 
 	for _, block := range content.Blocks {
+		pos := defPos{
+			file:   block.DefRange.Filename,
+			line:   block.DefRange.Start.Line,
+			column: block.DefRange.Start.Column,
+		}
+		if _, exists := seen[pos]; exists {
+			continue
+		}
+		seen[pos] = struct{}{}
+
 		filename := block.DefRange.Filename
 
 		fileCounts[filename]++

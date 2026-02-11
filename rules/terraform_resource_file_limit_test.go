@@ -74,6 +74,55 @@ resource "aws_subnet" "b" {}
 			expectIssues: 0,
 		},
 		{
+			name: "for_each resource counts as one block",
+			files: map[string]string{
+				"main.tf": `
+resource "aws_budgets_budget" "account" {
+  for_each = var.accounts
+  name     = each.key
+}
+resource "aws_budgets_budget" "total" {
+  name = "total"
+}
+`,
+			},
+			maxResources: 2,
+			expectIssues: 0,
+		},
+		{
+			name: "count resource counts as one block",
+			files: map[string]string{
+				"main.tf": `
+resource "aws_instance" "a" {
+  count = 3
+}
+resource "aws_instance" "b" {
+  count = 5
+}
+resource "aws_instance" "c" {}
+`,
+			},
+			maxResources: 3,
+			expectIssues: 0,
+		},
+		{
+			name: "for_each with data blocks counts correctly",
+			files: map[string]string{
+				"main.tf": `
+data "aws_organizations_organization" "current" {}
+data "aws_caller_identity" "current" {}
+resource "aws_organizations_organizational_unit" "this" {
+  for_each = var.ou_names
+}
+resource "aws_organizations_account" "this" {
+  for_each = var.accounts
+}
+`,
+			},
+			maxResources: 4,
+			expectIssues: 0,
+		},
+		{
 			name: "no resources produces no issue",
 			files: map[string]string{
 				"main.tf": `variable "name" {}`,
