@@ -1,0 +1,80 @@
+version: "3"
+
+tasks:
+  commit-msg:
+    desc: Validate commit message follows Conventional Commits
+    cmds:
+      - cog verify --file {{.CLI_ARGS}}
+
+  trailing-whitespace:
+    desc: Check for trailing whitespace
+    cmds:
+      - |
+        if git diff --cached --diff-filter=d --name-only | xargs grep -Hn '[[:blank:]]$' 2>/dev/null; then
+          echo "Trailing whitespace found"
+          exit 1
+        fi
+
+  end-of-file:
+    desc: Check files end with newline
+    cmds:
+      - |
+        fail=0
+        for f in $(git diff --cached --diff-filter=d --name-only); do
+          if [ -s "$f" ] && [ -n "$(tail -c 1 "$f")" ]; then
+            echo "$f: no newline at end of file"
+            fail=1
+          fi
+        done
+        exit $fail
+
+  check-yaml:
+    desc: Validate YAML syntax
+    cmds:
+      - |
+        for f in $(git diff --cached --diff-filter=d --name-only -- '*.yaml' '*.yml'); do
+          python3 -c "import yaml; yaml.safe_load(open('$f'))" 2>/dev/null || \
+          yq e '.' "$f" > /dev/null
+        done
+
+  check-large-files:
+    desc: Check staged files are under 500KB
+    cmds:
+      - |
+        MAX_KB=500
+        fail=0
+        for f in $(git diff --cached --diff-filter=d --name-only); do
+          size=$(wc -c < "$f" 2>/dev/null || echo 0)
+          if [ "$size" -gt $((MAX_KB * 1024)) ]; then
+            echo "$f exceeds ${MAX_KB}KB"
+            fail=1
+          fi
+        done
+        exit $fail
+
+  check-merge-conflict:
+    desc: Check for merge conflict markers
+    cmds:
+      - |
+        if git diff --cached --diff-filter=d --name-only | xargs grep -Hn '^<<<<<<< \|^=======$\|^>>>>>>> ' 2>/dev/null; then
+          echo "Merge conflict markers found"
+          exit 1
+        fi
+
+  file-size:
+    desc: Check Go source files are under 300 lines (tests and mocks excluded)
+    cmds:
+      - |
+        fail=0
+        MAX_LINES=300
+        for f in $(git diff --cached --diff-filter=d --name-only -- '*.go'); do
+          case "$f" in
+            *_test.go|*mock_*) continue ;;
+          esac
+          lines=$(wc -l < "$f")
+          if [ "$lines" -gt "$MAX_LINES" ]; then
+            echo "$f: $lines lines (limit: $MAX_LINES)"
+            fail=1
+          fi
+        done
+        exit $fail

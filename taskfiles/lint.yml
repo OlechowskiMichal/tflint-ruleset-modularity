@@ -32,6 +32,11 @@ tasks:
       - gofumpt -w .
       - goimports -w .
 
+  fmt:check:
+    desc: Check code formatting
+    cmds:
+      - test -z "$(gofmt -l .)"
+
   vet:
     desc: Run go vet
     cmds:
@@ -42,10 +47,35 @@ tasks:
     cmds:
       - go mod tidy
 
+  tidy:check:
+    desc: Check go modules are tidy
+    cmds:
+      - go mod tidy && git diff --exit-code go.mod go.sum
+
   vulncheck:
     desc: Check for security vulnerabilities
     cmds:
       - govulncheck ./...
+
+  errcheck:
+    desc: Check for unchecked errors
+    cmds:
+      - errcheck -blank -exclude .errcheck_excludes.txt ./...
+
+  cyclomatic:
+    desc: Check cyclomatic complexity
+    cmds:
+      - gocyclo -over 10 .
+
+  cognitive:
+    desc: Check cognitive complexity
+    cmds:
+      - gocognit -over 15 .
+
+  security:
+    desc: Run security scanner
+    cmds:
+      - gosec -quiet ./...
 
   mocks:
     desc: Generate mocks

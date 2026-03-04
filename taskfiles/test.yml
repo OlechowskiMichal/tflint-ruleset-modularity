@@ -27,3 +27,17 @@ tasks:
       - go test -coverprofile=coverage.out ./...
       - go tool cover -html=coverage.out -o coverage.html
       - go tool cover -func=coverage.out | grep '^total:'
+
+  coverage:check:
+    desc: Run tests and check coverage meets threshold
+    cmds:
+      - |
+        trap 'rm -f coverage.txt' EXIT
+        go test -race -short -coverprofile=coverage.txt -covermode=atomic ./...
+        COVERAGE=$(go tool cover -func=coverage.txt | grep '^total:' | awk '{print $3}' | tr -d '%')
+        THRESHOLD=50
+        if awk -v c="$COVERAGE" -v t="$THRESHOLD" 'BEGIN {exit !(c < t)}'; then
+          echo "Coverage ${COVERAGE}% is below threshold ${THRESHOLD}%"
+          exit 1
+        fi
+        echo "Coverage ${COVERAGE}% meets threshold ${THRESHOLD}%"

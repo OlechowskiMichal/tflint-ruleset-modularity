@@ -23,15 +23,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
+      - uses: jdx/mise-action@v2
 
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v7
-        with:
-          version: v2.7.2
-          only-new-issues: true
+      - name: Run linters
+        run: task lint
 
   test:
     name: Test
@@ -39,23 +34,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-          cache: true
+      - uses: jdx/mise-action@v2
 
-      - name: Run tests
-        run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
-
-      - name: Check coverage threshold
-        run: |
-          COVERAGE=$(go tool cover -func=coverage.txt | grep '^total:' | awk '{print $3}' | tr -d '%')
-          THRESHOLD=50
-          echo "Total coverage: ${COVERAGE}%"
-          if awk -v c="$COVERAGE" -v t="$THRESHOLD" 'BEGIN {exit !(c < t)}'; then
-            echo "::error::Coverage ${COVERAGE}% is below threshold ${THRESHOLD}%"
-            exit 1
-          fi
+      - name: Run tests with coverage check
+        run: task test:coverage:check
 
   build:
     name: Build
@@ -63,15 +45,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-          cache: true
+      - uses: jdx/mise-action@v2
 
       - name: Build
-        env:
-          CGO_ENABLED: "0"
-        run: go build -o tflint-ruleset-modularity .
+        run: task build
 
   commit-lint:
     name: Conventional Commits
