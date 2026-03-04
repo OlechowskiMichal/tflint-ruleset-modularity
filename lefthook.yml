@@ -1,3 +1,4 @@
 extends:
+  - lefthook/commit-msg.yml
   - lefthook/files.yml
   - lefthook/go.yml
