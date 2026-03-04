@@ -1,4 +1,5 @@
 [tools]
+cocogitto = "6"
 go = "1.25"
 golangci-lint = "1.62"
 goreleaser = "2"
