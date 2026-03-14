@@ -1,6 +1,12 @@
 # Development profile — additional tools for local work
+[settings]
+experimental = true
+
 [tools]
 lefthook = "1"
 mockery = "2"
 "go:golang.org/x/vuln/cmd/govulncheck" = "latest"
 "go:github.com/securego/gosec/v2/cmd/gosec" = "latest"
+
+[hooks]
+enter = "lefthook install"
